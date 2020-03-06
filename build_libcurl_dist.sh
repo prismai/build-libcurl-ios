@@ -2,8 +2,10 @@
 
 readonly XCODE_DEV="$(xcode-select -p)"
 export DEVROOT="${XCODE_DEV}/Toolchains/XcodeDefault.xctoolchain"
-DFT_DIST_DIR=${HOME}/Desktop/libcurl-ios-dist
-DIST_DIR=${DIST_DIR:-$DFT_DIST_DIR}
+#DFT_DIST_DIR=${HOME}/Desktop/libcurl-ios-dist
+#DIST_DIR=${DIST_DIR:-$DFT_DIST_DIR}
+
+DIST_DIR=$(pwd)
 
 function check_curl_ver() {
 echo "#include \"include/curl/curlver.h\"
@@ -24,6 +26,15 @@ function build_for_arch() {
   export LDFLAGS="-arch ${ARCH} -isysroot ${SYSROOT}"
   ./configure --disable-shared --without-zlib --enable-static --enable-ipv6 ${SSL_FLAG} --host="${HOST}" --prefix=${PREFIX} && make -j8 && make install
 }
+
+rm curl-7.69.0.tar.gz
+rm -rf curl-7.69.0
+rm -rf include
+rm -rf lib
+
+curl -O https://curl.haxx.se/download/curl-7.69.0.tar.gz
+tar xf curl-7.69.0.tar.gz
+cd curl-7.69.0
 
 if [ "${1:-''}" == "openssl" ]
 then
@@ -62,3 +73,12 @@ cp -r ${TMP_DIR}/arm64/include ${TMP_DIR}/
 
 mkdir -p ${DIST_DIR}
 cp -r ${TMP_DIR}/include ${TMP_DIR}/lib ${DIST_DIR}
+
+cd ..
+
+PKG_NAME=libcurl
+PKG_VERSION=7.69.0
+PKG_USER=bvnp43
+PKG_CHANNEL=stable
+
+conan export-pkg . ${PKG_NAME}/${PKG_VERSION}@${PKG_USER}/${PKG_CHANNEL} -s os=iOS -s os.version=12.1 -s arch=armv8
