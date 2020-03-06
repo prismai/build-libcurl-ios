@@ -12,12 +12,8 @@ Tested curl 7.69.0
 Usage
 =================
 ```
-curl -O https://curl.haxx.se/download/curl-7.69.0.tar.gz
-tar xf curl-7.69.0.tar.gz
-cd curl-7.69.0
-......
+./build_libcurl_dist.sh
 ```
-Find the result libcurl-ios-dist on your desktop.
 
 curl-7.52.1 issue
 =================
